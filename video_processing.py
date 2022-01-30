@@ -23,7 +23,7 @@ class VideoProcessing:
         while success:
             success, frame = video.read()
             if success:
-                img_path = str(output_path.joinpath(f'{self.video_name}_{int(interval_ms*frame_counter)}_ms.jpg'))
+                img_path = str(output_path.joinpath(f'{int(interval_ms*frame_counter)}_ms.jpg'))
                 cv.imwrite(img_path, frame)
 
             frame_counter = frame_counter + 1
