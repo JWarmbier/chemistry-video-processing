@@ -9,9 +9,16 @@ from log_colours import log_colors as color
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
+import argparse
 
-VIDEO_DIR           = './videos'
-VIDEO_FRAMES_DIR    = './images'
+def parse_input_arguments():
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input_dir', type=str, default='./videos/',
+                        help='indicate the input directory where the program should find all videos for processing.')
+    parser.add_argument('--result_dir', type=str, default='./images/', help='indicate the output directory for results.')
+
+    return parser.parse_args()
 
 
 def list_files(directory, extension="MP4", verbose=False):
@@ -52,10 +59,12 @@ def extract_images(video_list, output_dir):
 
 
 if __name__ == "__main__":
-    video_path = Path(VIDEO_DIR)
-    video_frame_output_path = Path(VIDEO_FRAMES_DIR)
+    args  = parse_input_arguments()
 
-    video_list = list_files(VIDEO_DIR, 'mp4', verbose=True)
+    video_path = Path(args.input_dir)
+    video_frame_output_path = Path(args.result_dir)
+
+    video_list = list_files(args.input_dir, 'mp4', verbose=True)
     extract_images(video_list, video_frame_output_path)
 
     video_frame_paths = [video_frame_output_path.joinpath(video.stem) for video in video_list]
