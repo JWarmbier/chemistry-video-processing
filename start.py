@@ -10,6 +10,10 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
+import re
+
+MP4_REGEX = '\.mp4$'
+JPG_REGEX = '\.jpg$'
 
 def parse_input_arguments():
 
@@ -20,18 +24,27 @@ def parse_input_arguments():
 
     return parser.parse_args()
 
+def select_paths(paths, regex):
+    matched_paths = []
+    for file in paths:
+        if re.search(regex, file.name.lower()) is not None:
+            matched_paths.append(file)
 
-def list_files(directory, extension="MP4", verbose=False):
+    return matched_paths
+
+
+def list_files(directory, MP4_REGEX, verbose=False):
     directory = Path(directory)
-    files = []
 
     if verbose:
-        print(color.HEADER + color.BOLD + f'Searching all files with {extension} extension in {directory}' + color.END)
+        print(color.HEADER + color.BOLD + f'Searching all files with {MP4_REGEX} extension in {directory}' + color.END)
 
     if not directory.exists():
         raise Exception(f'Path {directory} does not exits.')
 
-    files = list(directory.glob(f'**/*.{extension}'))
+    found_files = list(directory.glob(f'**/*'))
+
+    files = select_paths(found_files, MP4_REGEX)
 
     if verbose:
         if files is not None and len(files) > 0:
@@ -65,7 +78,7 @@ if __name__ == "__main__":
     video_path = Path(args.input_dir)
     video_frame_output_path = Path(args.result_dir)
 
-    video_list = list_files(args.input_dir, 'mp4', verbose=True)
+    video_list = list_files(args.input_dir, MP4_REGEX, verbose=True)
     extract_images(video_list, video_frame_output_path)
 
     video_frame_paths = [video_frame_output_path.joinpath(video.stem) for video in video_list]
@@ -75,7 +88,7 @@ if __name__ == "__main__":
 
         for video_frame_path in video_frame_paths:
             print(f'\n Processing frames from directory: ./{video_frame_path}/')
-            frame_paths = list_files(video_frame_path, "jpg")
+            frame_paths = list_files(video_frame_path, JPG_REGEX)
             frame_values = []
 
             for frame_path in frame_paths:
